@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from app.api.endpoints import auth  # Imports the router from your auth endpoint file
 from app.db.base import Base
 from app.db.session import engine
+from app.models.user import User  # Import User model
+from app.models.token import Token  # Import Token model
 
 # This command tells SQLAlchemy to create all database tables based on your models
 # It should be run once at startup.

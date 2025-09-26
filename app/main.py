@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.endpoints import auth, superadmin, organizer, upload  # Import all routers
+from app.api.endpoints import auth, superadmin, organizer, upload, user  # Import all routers
 from app.db.base import Base
 from app.db.session import engine
 from app.models import User, Token
@@ -112,6 +112,8 @@ app.include_router(organizer.router, prefix="/api/organizer")
 
 # File upload routes
 app.include_router(upload.router, prefix="/api/upload", tags=["File Upload"])
+
+app.include_router(user.router, prefix="/api/user", tags=["User"])
 
 # A simple root endpoint to confirm the API is running.
 @app.get("/")

@@ -1,4 +1,5 @@
-from pydantic import BaseModel, field_validator
+from unicodedata import category
+from pydantic import BaseModel, field_validator, HttpUrl, model_validator
 from typing import Optional, List
 from datetime import datetime
 from app.enums.player_type import BattingStyle, BowlingStyle, PlayerRole
@@ -6,18 +7,22 @@ from app.enums.player_type import BattingStyle, BowlingStyle, PlayerRole
 # Tournament DTOs
 class TournamentCreate(BaseModel):
     name: str
-    location: str
     description: Optional[str] = None
+    category: str
+    logo: Optional[HttpUrl] = None 
+    class Config:
+        from_attributes = True
 
-class Tournament(BaseModel):
+class TournamentResponse(BaseModel):
     id: int
     name: str
-    location: str
     description: Optional[str] = None
+    category: str
     created_by: int
     created_at: datetime
     updated_at: datetime
     is_active: bool
+    logo: Optional[HttpUrl] = None
 
     class Config:
         from_attributes = True
@@ -36,7 +41,7 @@ class Season(BaseModel):
     created_at: datetime
     registration_open: bool
     is_active: bool
-    tournament: Tournament
+    tournament: TournamentResponse
 
     class Config:
         from_attributes = True

@@ -9,15 +9,17 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from app.models import User
 from app.models.tournament import Tournament as TournamentModel, Season as SeasonModel
-from app.dto.tournament_dto import Tournament, TournamentCreate, Season, SeasonCreate
+from app.dto.tournament_dto import TournamentResponse, TournamentCreate, Season, SeasonCreate
 from app.managers.validation_manager import ValidationManager
+from app.utils.s3_helper import S3Helper
+from pydantic import model_validator
 
 
 class TournamentService:
     """Service for tournament and season management operations."""
     
     @staticmethod
-    def create_tournament(tournament_data: TournamentCreate, current_user: User, db: Session) -> TournamentModel:
+    def create_tournament(tournament_data: TournamentCreate, current_user: User, db: Session) -> TournamentResponse:
         """
         Create a new tournament. No credit limit - organizers can create unlimited tournaments.
         """
@@ -28,22 +30,25 @@ class TournamentService:
             TournamentModel.is_active == True
         ).first()
         
+        
         if existing_tournament:
             raise HTTPException(
                 status_code=400,
                 detail=f"Tournament with name '{tournament_data.name}' already exists"
             )
-        
+
+        logo_key = S3Helper().extract_file_key_from_url(tournament_data.logo)
         new_tournament = TournamentModel(
             name=tournament_data.name,
             description=tournament_data.description,
-            location=tournament_data.location,
+            logo_key=logo_key,
+            category=tournament_data.category,
             created_by=current_user.id
         )
         db.add(new_tournament)
         db.commit()
         db.refresh(new_tournament)
-        return new_tournament
+        return TournamentResponse.model_validate(new_tournament)
 
     @staticmethod
     def create_season(tournament_id: int, season_data: SeasonCreate, current_user: User, db: Session) -> SeasonModel:
@@ -103,4 +108,6 @@ class TournamentService:
         tournaments = db.query(TournamentModel).filter(
             TournamentModel.created_by == current_user.id
         ).order_by(TournamentModel.created_at.desc()).all()
+
+        # tournaments.logo_key = S3Helper().get_file_url(tournaments.logo_key)
         return tournaments

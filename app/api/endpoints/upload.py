@@ -10,6 +10,7 @@ from typing import Optional
 from app.api import deps
 from app.models import User
 from app.utils.s3_helper import s3_helper
+from app.enums import UploadType
 
 router = APIRouter()
 
@@ -23,8 +24,9 @@ def generate_upload_url(
     Generate a presigned URL for uploading image files to S3.
     
     Upload types:
-    - player_photo: For player profile photos
-    - team_logo: For team logos
+    - player_photo
+    - team_logo
+    - tournament_logo
     
     Supported image types:
     - image/jpeg, image/jpg, image/png, image/gif, image/webp
@@ -35,7 +37,7 @@ def generate_upload_url(
     ]
     
     # Validate upload type
-    allowed_upload_types = ["player_photo", "team_logo"]
+    allowed_upload_types = ["player_photo", "team_logo","tournament_logo"]
     if upload_type not in allowed_upload_types:
         raise HTTPException(
             status_code=400,
@@ -50,8 +52,9 @@ def generate_upload_url(
     
     # Map upload type to S3 folder
     folder_mapping = {
-        "player_photo": "player_photos",
-        "team_logo": "team_logos"
+        "player_photo": UploadType.PLAYER_PHOTO.value,
+        "team_logo": UploadType.TEAM_LOGO.value,
+        "tournament_logo": UploadType.TOURNAMENT_LOGO.value,
     }
     
     # Generate presigned URL for image upload
@@ -73,7 +76,7 @@ def generate_upload_url(
             },
             "note": f"Upload your {upload_type.replace('_', ' ')} to the upload_url using PUT method. After successful upload, use file_url in your player/team registration API calls."
         }
-    }
+    }   
 
 @router.get("/download-url", tags=["File Upload"])
 def generate_download_url(

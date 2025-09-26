@@ -1,8 +1,9 @@
+from unicodedata import category
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Enum, Numeric
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.db.base import Base
-from app.enums.auction_status import AuctionMode
+from app.enums import TournamentCategory, AuctionMode
 
 class Tournament(Base):
     __tablename__ = "tournaments"
@@ -10,7 +11,8 @@ class Tournament(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
     description = Column(String(500), nullable=True)
-    location = Column(String(255), nullable=False)
+    logo_key = Column(String(500), nullable=True)
+    category = Column(Enum(TournamentCategory), nullable=False, default=TournamentCategory.OTHER)
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())

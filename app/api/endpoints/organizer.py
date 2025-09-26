@@ -5,7 +5,7 @@ from app.api import deps
 from app.models import User
 from app.dto.user_dto import User as UserSchema
 from app.dto.tournament_dto import (
-    Tournament, TournamentCreate, Season, SeasonCreate, 
+    TournamentResponse, TournamentCreate, Season, SeasonCreate, 
     Player, PlayerCreate, PlayerSeason, PlayerSelectionUpdate
 )
 from app.dto.team_dto import (
@@ -41,7 +41,7 @@ def get_organizer_profile(
 
 
 # Tournament Management
-@router.post("/tournaments", response_model=Tournament, tags=["Tournament Management"])
+@router.post("/tournaments", response_model=TournamentResponse, tags=["Tournament Management"])
 def create_tournament(
     tournament_data: TournamentCreate,
     db: Session = Depends(deps.get_db),
@@ -85,7 +85,7 @@ def get_my_seasons(
     """
     return TournamentService.get_my_seasons(current_user, db)
 
-@router.get("/tournaments", response_model=List[Tournament], tags=["Tournament Management"])
+@router.get("/tournaments", response_model=List[TournamentResponse], tags=["Tournament Management"])
 def get_my_tournaments(
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_organizer)

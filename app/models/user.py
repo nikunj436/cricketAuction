@@ -18,6 +18,7 @@ class User(Base):
     is_approved = Column(Boolean, default=None, nullable=True)
     auction_limit = Column(Integer, default=0, nullable=False)
     auctions_created = Column(Integer, default=0, nullable=False)
+    is_verified = Column(Boolean, default=False)
     
     # --- Relationships ---
     tokens = relationship("Token", back_populates="user", cascade="all, delete-orphan")

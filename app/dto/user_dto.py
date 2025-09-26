@@ -47,9 +47,14 @@ class User(BaseModel):
     email: EmailStr
     mobile: str
     role: Role
-    is_approved: Optional[bool]           
+    is_approved: Optional[bool]     
+    is_verified: Optional[bool]      
     auction_limit: int          
     auctions_created: int       
 
     class Config:
         from_attributes = True
+
+class updateUser(BaseModel):
+    first_name: Optional[str]
+    last_name: Optional[str]
